@@ -3,16 +3,8 @@ import io
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpResponse
-from reportlab.pdfgen import canvas # Remember to: pip install reportlab
-
-from .models import AnalysisHistory  # Add this at the top
-
-# Inside your post method, after calculating stats:
-AnalysisHistory.objects.create(
-    filename=file.name,
-    avg_temp=stats['avg_temp'],
-    avg_pressure=stats['avg_pressure']
-)
+from reportlab.pdfgen import canvas 
+from .models import AnalysisHistory 
 
 class UploadView(APIView):
     def post(self, request):
@@ -22,7 +14,7 @@ class UploadView(APIView):
         file = request.FILES['file']
         df = pd.read_csv(file)
         
-        # Calculate Stats
+        # 1. Calculate Stats
         stats = {
             "total_count": int(len(df)),
             "avg_temp": round(float(df['Temperature'].mean()), 2),
@@ -30,17 +22,30 @@ class UploadView(APIView):
             "type_distribution": df['Type'].value_counts().to_dict(),
         }
 
-        # If URL has ?download=pdf, return PDF instead of JSON
+        # 2. Save to Database History
+        AnalysisHistory.objects.create(
+            filename=file.name,
+            avg_temp=stats['avg_temp'],
+            avg_pressure=stats['avg_pressure']
+        )
+
+        # 3. Check for PDF request
         if request.query_params.get('download') == 'pdf':
-            buffer = io.BytesIO()
-            p = canvas.Canvas(buffer)
-            p.drawString(100, 800, "FOSSEE Chemical Equipment Report")
-            p.drawString(100, 780, f"Total Units: {stats['total_count']}")
-            p.drawString(100, 760, f"Avg Temp: {stats['avg_temp']} C")
-            p.drawString(100, 740, f"Avg Pressure: {stats['avg_pressure']} bar")
-            p.showPage()
-            p.save()
-            buffer.seek(0)
-            return HttpResponse(buffer, content_type='application/pdf')
+            return self.generate_pdf(stats)
         
         return Response(stats)
+
+    # THIS IS THE GENERATE PDF FUNCTION
+    def generate_pdf(self, stats):
+        buffer = io.BytesIO()
+        p = canvas.Canvas(buffer)
+        p.setFont("Helvetica-Bold", 16)
+        p.drawString(100, 800, "FOSSEE Chemical Equipment Report")
+        p.setFont("Helvetica", 12)
+        p.drawString(100, 770, f"Total Units analyzed: {stats['total_count']}")
+        p.drawString(100, 750, f"Average Temperature: {stats['avg_temp']} C")
+        p.drawString(100, 730, f"Average Pressure: {stats['avg_pressure']} bar")
+        p.showPage()
+        p.save()
+        buffer.seek(0)
+        return HttpResponse(buffer, content_type='application/pdf')
