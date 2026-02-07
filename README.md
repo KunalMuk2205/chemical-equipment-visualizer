@@ -28,7 +28,7 @@ The project follows a **Client-Server architecture**:
 3. **Desktop Client:** Built with **PyQt5**, offering a native experience using **Matplotlib** for graphing.
 
 ---
-###🧠 Intelligence Engine
+## 🧠 Intelligence Engine
 
 Unlike standard visualizers, this tool includes an Anomaly Detection Engine:
 
