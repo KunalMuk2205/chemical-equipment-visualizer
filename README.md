@@ -1,5 +1,6 @@
-# ⚗️ Chemical Equipment Parameter Visualizer
-### Hybrid Web + Desktop Application
+# ⚗️ Chem-Analytics Pro: Chemical Equipment Visualizer
+### Hybrid Web + Desktop Application with Intelligence Core
+This repository contains a Hybrid Full-Stack Application designed for chemical engineers to visualize and analyze equipment parameters. It features a centralized Django REST API that serves both a React.js Web Dashboard and a PyQt5 Desktop Client.
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/Django-5.0+-green.svg)](https://www.djangoproject.com/)
@@ -11,6 +12,7 @@ This repository contains a **Hybrid Full-Stack Application** designed for chemic
 
 ## 📖 Table of Contents
 * [Architecture](#architecture)
+* [Intelligence Engine](#intelligence)
 * [Tech Stack](#tech-stack)
 * [Key Features](#key-features)
 * [Installation & Setup](#installation--setup)
@@ -26,7 +28,15 @@ The project follows a **Client-Server architecture**:
 3. **Desktop Client:** Built with **PyQt5**, offering a native experience using **Matplotlib** for graphing.
 
 ---
+###🧠 Intelligence Engine
 
+Unlike standard visualizers, this tool includes an Anomaly Detection Engine:
+
+1. **Statistical Analysis:** The backend calculates the Mean and Standard Deviation for all equipment parameters.
+2. **Outlier Detection:**  Using the Z-Score method, any equipment with temperature $> (\mu + 2\sigma)$ is flagged as a "Warning."
+3. **Alert Sync:** These alerts are highlighted in red on the dashboard and included in the PDF summary report.
+   
+---
 ## 🛠️ Tech Stack
 | Component | Technologies |
 | :--- | :--- |
